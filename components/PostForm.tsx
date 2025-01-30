@@ -5,12 +5,33 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { ImageIcon, XIcon } from "lucide-react";
 import { useRef, useState } from "react";
+import createPostAction from "@/actions/createPostAction";
 
 function PostForm() {
    const ref = useRef<HTMLFormElement>(null);
    const fileInputRef = useRef<HTMLInputElement>(null);
    const { user } = useUser();
    const [preview, setPreview] = useState<string | null>(null);
+
+   async function handlePostAction(formData: FormData) {
+      const formDataCopy = formData;
+      ref.current?.reset();
+
+      const text = formDataCopy.get("postInput") as string;
+
+      if (!text.trim()) {
+         throw new Error("You must provide a post input");
+      }
+
+      setPreview(null);
+
+      try {
+         // Server action responsible for submiting a post
+         await createPostAction(formDataCopy);
+      } catch (error) {
+         console.error("Error creating a post: ", error);
+      }
+   }
 
    function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
       // Access the first file passed by the input field
@@ -22,12 +43,14 @@ function PostForm() {
       }
    }
 
+
    return (
       <div className="mb-2">
          <form
             ref={ref}
             action={(formData) => {
                // Handle form submission with server action
+               handlePostAction(formData);
                // Toast notification based on the promise above 
             }}
             className="p-3 bg-white rounded-lg border"
