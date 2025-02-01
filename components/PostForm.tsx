@@ -43,7 +43,6 @@ function PostForm() {
       }
    }
 
-
    return (
       <div className="mb-2">
          <form
