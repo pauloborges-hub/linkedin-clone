@@ -10,6 +10,7 @@ import { LikePostRequestBody } from "@/app/api/posts/[post_id]/like/route"
 import { UnlikePostRequestBody } from "@/app/api/posts/[post_id]/unlike/route"
 import CommentForm from "./CommentForm"
 import CommentFeed from "./CommentFeed"
+import { toast } from "sonner"
 
 function PostOptions({ post }: { post: IPostDocument }) {
    const { user } = useUser()
@@ -53,6 +54,8 @@ function PostOptions({ post }: { post: IPostDocument }) {
       if (!response.ok) {
          setLiked(originalLiked)
          setLikes(originalLikes)
+
+         toast.error("Failed to like or unlike post")
 
          throw new Error("Failed to Like or Unlike post")
       }

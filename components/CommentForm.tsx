@@ -3,10 +3,14 @@
 import { useUser } from "@clerk/nextjs"
 import { useRef } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import createCommentAction from "@/actions/createCommentAction"
+import { toast } from "sonner"
 
 function CommentForm({ postId }: { postId: string }) {
    const { user } = useUser()
    const ref = useRef<HTMLFormElement>(null)
+
+   const createCommentActionWithPostId = createCommentAction.bind(null, postId)
 
    async function handleCommentAction(formData: FormData): Promise<void> {
       if (!user?.id) {
@@ -18,7 +22,7 @@ function CommentForm({ postId }: { postId: string }) {
 
       try {
          // server action
-         // await createCommentActionWithPostId(formDataCopy)
+         await createCommentActionWithPostId(formDataCopy)
       } catch (error) {
          console.error(`Error creating comment: ${error}`)
       }
@@ -31,6 +35,12 @@ function CommentForm({ postId }: { postId: string }) {
             const promise = handleCommentAction(formData)
 
             // Toast
+            // Toast notification based on the promise above 
+            toast.promise(promise, {
+               loading: "Adding comment...",
+               success: "Comment added",
+               error: "Failed to comment on the post"
+            })
          }}
          className="flex items-center space-x-1"
       >
